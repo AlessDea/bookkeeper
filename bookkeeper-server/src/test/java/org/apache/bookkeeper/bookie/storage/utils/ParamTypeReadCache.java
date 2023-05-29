@@ -1,0 +1,10 @@
+package org.apache.bookkeeper.bookie.storage.utils;
+
+public enum ParamTypeReadCache {
+	POSITIVE_EXISTING_LEDGER_ID,
+	POSITIVE_NON_EXISTING_LEDGER_ID,
+	NEGATIVE_LEDGER_ID,
+	POSITIVE_EXISTING_ENTRY_ID,
+	POSITIVE_NON_EXISTING_ENTRY_ID,
+	NEGATIVE_ENTRY_ID
+}

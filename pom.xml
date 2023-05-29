@@ -72,6 +72,10 @@
     <module>native-io</module>
     <module>testtools</module>
     <module>stats/bookkeeper-stats-providers/otel-metrics-provider</module>
+
+    <!-- ISW: tests coverage -->
+    <module>tests-coverage</module>
+
   </modules>
   <mailingLists>
     <mailingList>
@@ -213,6 +217,14 @@
     <maven-failsafe-plugin.version>3.0.0-M6</maven-failsafe-plugin.version>
     <awaitility.version>4.0.3</awaitility.version>
     <otel.version>1.26.0</otel.version>
+
+
+    <!-- ISW: sonarcloud my info + Jacoco info -->
+    <sonar.coverage.jacoco.xmlReportPaths>${maven.multiModuleProjectDirectory}/tests-coverage/target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
+    <sonar.organization>enricodalessandro97uni</sonar.organization>
+    <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+
+
   </properties>
 
   <!-- dependency definitions -->
@@ -1307,5 +1319,30 @@
         </plugins>
       </build>
     </profile>
+
+    <!-- ISW: Jacoco profile -->
+    <profile>
+      <id>coverage-profile</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>prepare-agent</id>
+                <goals>
+                  <goal>prepare-agent</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
   </profiles>
 </project>
