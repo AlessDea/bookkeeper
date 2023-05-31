@@ -350,6 +350,7 @@ public final class MetadataDrivers {
     public static <T> T runFunctionWithMetadataBookieDriver(ServerConfiguration conf,
                                                             Function<MetadataBookieDriver, T> function)
             throws MetadataException, ExecutionException {
+
         try (MetadataBookieDriver driver = MetadataDrivers.getBookieDriver(
             URI.create(conf.getMetadataServiceUri())
         )) {

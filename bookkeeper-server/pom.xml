@@ -228,6 +228,28 @@
       <artifactId>awaitility</artifactId>
       <scope>test</scope>
     </dependency>
+
+    <!-- ISW: curator test for create a zookeeper server -->
+    <dependency>
+      <groupId>org.apache.curator</groupId>
+      <artifactId>curator-framework</artifactId>
+      <version>5.4.0</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.curator</groupId>
+      <artifactId>curator-test</artifactId>
+      <version>5.4.0</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.curator</groupId>
+      <artifactId>curator-client</artifactId>
+      <version>5.4.0</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
   <build>
     <plugins>

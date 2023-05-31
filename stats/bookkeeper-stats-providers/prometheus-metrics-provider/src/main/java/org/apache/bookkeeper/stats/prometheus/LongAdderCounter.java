@@ -70,6 +70,11 @@ public class LongAdderCounter implements Counter {
     }
 
     @Override
+    public void add(long delta) {
+
+    }
+
+    @Override
     public Long get() {
         return counter.sum();
     }

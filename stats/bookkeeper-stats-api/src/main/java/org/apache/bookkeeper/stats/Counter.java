@@ -53,6 +53,8 @@ public interface Counter {
      */
     void addLatency(long eventLatency, TimeUnit unit);
 
+    void add(long delta);
+
     /**
      * Get the value associated with this stat.
      */

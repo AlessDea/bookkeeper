@@ -57,7 +57,12 @@ import org.apache.bookkeeper.stats.Counter;
         counter.add(valueMillis);
     }
 
-    @Override
+     @Override
+     public void add(long delta) {
+
+     }
+
+     @Override
     public Long get() {
         return -1L;
     }

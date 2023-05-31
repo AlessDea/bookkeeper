@@ -76,6 +76,11 @@ public class ThreadScopedLongAdderCounter implements Counter {
     }
 
     @Override
+    public void add(long delta) {
+
+    }
+
+    @Override
     public Long get() {
         return getCounter().get();
     }

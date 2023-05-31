@@ -31,22 +31,8 @@ import com.google.common.util.concurrent.UncheckedExecutionException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.SortedMap;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.ExecutionException;
@@ -1258,7 +1244,6 @@ public class BookKeeperAdmin implements AutoCloseable {
                 try {
                     try (RegistrationManager regManager = driver.createRegistrationManager()) {
                         boolean ledgerRootExists = regManager.prepareFormat();
-
                         // If old data was there then confirm with admin.
                         boolean doFormat = true;
                         if (ledgerRootExists) {
@@ -1273,18 +1258,16 @@ public class BookKeeperAdmin implements AutoCloseable {
                                                 + "This may cause data loss.");
                             }
                         }
-
                         if (!doFormat) {
                             return false;
                         }
-
                         driver.getLedgerManagerFactory().format(
                                 conf,
                                 driver.getLayoutManager());
-
                         return regManager.format();
                     }
                 } catch (Exception e) {
+                    System.out.println("EXC:" + Arrays.toString(e.getStackTrace()));
                     throw new UncheckedExecutionException(e.getMessage(), e);
                 }
             }

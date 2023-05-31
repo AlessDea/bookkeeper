@@ -98,6 +98,11 @@ public class NullStatsLogger implements StatsLogger {
         }
 
         @Override
+        public void add(long delta) {
+
+        }
+
+        @Override
         public Long get() {
             return 0L;
         }
