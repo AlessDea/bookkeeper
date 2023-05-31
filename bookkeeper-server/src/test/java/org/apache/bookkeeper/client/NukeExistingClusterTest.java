@@ -116,7 +116,7 @@ public class NukeExistingClusterTest extends BookKeeperClusterTestCase {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
 
 
@@ -129,16 +129,17 @@ public class NukeExistingClusterTest extends BookKeeperClusterTestCase {
 
 
     @Test
-    public void testNukeExistingCluster(){
+    public void testNukeExistingCluster() {
         boolean ret;
 
+        // I need to create a new ServerConfiguration (based on baseConf) because baseConf is final
+        ServerConfiguration newConfig = new ServerConfiguration(baseConf);
 
-        if(this.conf.equals(confEnum.VALID)){
 
+        try {
+            if (this.conf.equals(confEnum.VALID)) {
 
-
-            try {
-
+                newConfig.setMetadataServiceUri(newMetadataServiceUri(this.ledgerRootPath));
                 //create a valid istanceId
                 byte[] data = zkc.getData(
                         ZKMetadataDriverBase.resolveZkLedgersRootPath(baseConf) + "/" + BookKeeperConstants.INSTANCEID,
@@ -148,14 +149,27 @@ public class NukeExistingClusterTest extends BookKeeperClusterTestCase {
                 baseConf.setMetadataServiceUri(newMetadataServiceUri(this.ledgerRootPath));
 
                 ret = BookKeeperAdmin.nukeExistingCluster(baseConf, this.ledgerRootPath, this.instanceId, this.force);
-            } catch (Exception e) {
-                ret = false;
-            }
-        }else if(this.confEnum.INVALID)
 
+            } else if (this.conf.equals(confEnum.INVALID)) {
+
+                newConfig.setMetadataServiceUri(newMetadataServiceUri("\\wrong_path"));
+                newConfig.setBookiePort(-100);
+                newConfig.setMetadataServiceUri("wrong...");
+
+
+                ret = BookKeeperAdmin.nukeExistingCluster(newConfig, this.ledgerRootPath, this.instanceId, this.force);
+
+            } else {
+
+                newConfig = null;
+                ret = BookKeeperAdmin.nukeExistingCluster(newConfig, this.ledgerRootPath, this.instanceId, this.force);
+
+            }
+
+        } catch (Exception e) {
+            ret = false;
+        }
 
         assertEquals(expected, ret);
-
     }
-
 }
