@@ -222,7 +222,7 @@
 
     <!-- ISW: sonarcloud my info + Jacoco info -->
     <sonar.coverage.jacoco.xmlReportPaths>${maven.multiModuleProjectDirectory}/tests-coverage/target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
-    <sonar.organization>enricodalessandro97uni</sonar.organization>
+    <sonar.organization>alessdea</sonar.organization>
     <sonar.host.url>https://sonarcloud.io</sonar.host.url>
 
 
