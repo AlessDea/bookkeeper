@@ -140,6 +140,11 @@ public class BroadCastStatsLogger {
                 }
 
                 @Override
+                public void add(long delta) {
+
+                }
+
+                @Override
                 public Long get() {
                     // Eventually consistent.
                     return firstCounter.get();

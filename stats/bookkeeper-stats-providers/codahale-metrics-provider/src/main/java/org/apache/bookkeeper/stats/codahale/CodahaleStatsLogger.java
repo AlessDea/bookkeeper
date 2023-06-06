@@ -80,6 +80,11 @@ public class CodahaleStatsLogger implements StatsLogger {
                 long valueMillis = unit.toMillis(eventLatency);
                 c.inc(valueMillis);
             }
+
+            @Override
+            public void add(long delta) {
+
+            }
         };
     }
 

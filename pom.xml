@@ -73,6 +73,7 @@
     <module>testtools</module>
     <module>stats/bookkeeper-stats-providers/otel-metrics-provider</module>
 
+
     <!-- ISW: tests coverage -->
     <module>tests-coverage</module>
 
