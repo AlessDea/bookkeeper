@@ -16,7 +16,7 @@
       <artifactId>bookkeeper-server</artifactId>
       <version>${project.parent.version}</version>
     </dependency>
-    <!-- <dependency>
+    <dependency>
       <groupId>org.apache.bookkeeper</groupId>
       <artifactId>bookkeeper-benchmark</artifactId>
       <version>${project.parent.version}</version>
@@ -64,11 +64,6 @@
     <dependency>
       <groupId>org.apache.bookkeeper</groupId>
       <artifactId>bookkeeper-proto</artifactId>
-      <version>${project.parent.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.bookkeeper.stats</groupId>
-      <artifactId>bookkeeper-stats-api</artifactId>
       <version>${project.parent.version}</version>
     </dependency>
     <dependency>
@@ -315,7 +310,7 @@
       <groupId>org.apache.bookkeeper</groupId>
       <artifactId>stream-storage-cli</artifactId>
       <version>${project.parent.version}</version>
-    </dependency> -->
+    </dependency>
   </dependencies>
 
   <build>

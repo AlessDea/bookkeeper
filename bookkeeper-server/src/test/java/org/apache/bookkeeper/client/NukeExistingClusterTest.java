@@ -5,10 +5,7 @@ import org.apache.bookkeeper.conf.ServerConfiguration;
 import org.apache.bookkeeper.meta.zk.ZKMetadataDriverBase;
 import org.apache.bookkeeper.test.BookKeeperClusterTestCase;
 import org.apache.bookkeeper.util.BookKeeperConstants;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
@@ -127,7 +124,9 @@ public class NukeExistingClusterTest extends BookKeeperClusterTestCase {
         super.tearDown();
     }
 
-
+/*
+    @Ignore
+*/
     @Test
     public void testNukeExistingCluster() {
         boolean ret;

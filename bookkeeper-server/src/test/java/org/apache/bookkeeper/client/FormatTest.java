@@ -115,6 +115,9 @@ public class FormatTest extends BookKeeperClusterTestCase{
     }
 
 
+/*
+    @Ignore
+*/
     @Test
     public void testFormat() {
         boolean ret;
