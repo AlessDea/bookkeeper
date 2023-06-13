@@ -394,6 +394,50 @@
       </build>
     </profile>
 
+    <!-- ISW2: badua -->
+    <profile>
+      <id>badua</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <version>${maven-surefire-plugin.version}</version>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>test</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <argLine>
+                "-javaagent:data-fc-badua/ba-dua-agent-rt-0.6.0-all.jar"
+              </argLine>
+            </configuration>
+          </plugin>
+
+          <!--<plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <version>1.5.0</version>
+            <executions>
+              <execution>
+                <id>Generate Ba-Dua report</id>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <phase>test</phase>
+                <configuration>
+                  <executable>data-fc-badua/from_ser_to_xml.sh</executable>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>-->
+        </plugins>
+      </build>
+    </profile>
+
     <!-- Mutation PIT profile -->
     <profile>
       <id>mutation</id>
@@ -415,16 +459,12 @@
               <targetClasses>
                 <!-- classes to test  -->
                 <param>org.apache.bookkeeper.bookie.storage.ldb.ReadCache</param>
-<!--
                 <param>org.apache.bookkeeper.client.BookKeeperAdmin</param>
--->
               </targetClasses>
               <targetTests>
                 <!-- test implementations -->
                 <param>org.apache.bookkeeper.bookie.storage.ldb.ReadCacheTestSuite</param>
-<!--
                 <param>org.apache.bookkeeper.client.BookKeeperAdminTestSuite</param>
--->
               </targetTests>
               <avoidCallsTo>
                 <avoidCallsTo>org.slf4j</avoidCallsTo>

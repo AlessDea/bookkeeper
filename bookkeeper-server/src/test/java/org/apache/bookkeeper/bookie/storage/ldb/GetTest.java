@@ -67,6 +67,7 @@ public class GetTest {
 		this.expected = expected;
 		this.ledId = ledId;
 		this.entId = entId;
+		//System.out.println("" + ledId + " " + entId);
 	}
 
 
