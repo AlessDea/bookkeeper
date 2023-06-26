@@ -5,11 +5,15 @@ import org.apache.bookkeeper.conf.ServerConfiguration;
 import org.apache.bookkeeper.meta.zk.ZKMetadataDriverBase;
 import org.apache.bookkeeper.test.BookKeeperClusterTestCase;
 import org.apache.bookkeeper.util.BookKeeperConstants;
+import org.apache.zookeeper.KeeperException;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.Assert.assertEquals;
@@ -23,10 +27,16 @@ public class NukeExistingClusterTest extends BookKeeperClusterTestCase {
         NULL
     }
 
+    public static enum instanceIdEnum {
+        VALID,
+        INVALID,
+        NULL
+    }
+
     private boolean expected;
     private confEnum conf;
     private String ledgerRootPath;
-    private String instanceId;
+    private instanceIdEnum instanceId;
     private boolean force;
 
     private static confEnum invalid_c;
@@ -46,31 +56,37 @@ public class NukeExistingClusterTest extends BookKeeperClusterTestCase {
     @Parameterized.Parameters
     public static Collection<Object[]> getParameters(){
         return Arrays.asList(new Object[][]{
-                {false, confEnum.INVALID, "/ledgers", valid_iId, true},
-                {false, confEnum.INVALID, "/ledgers", inv_iId, false},
-                {false, confEnum.INVALID, "/ledgers", null, false},
-                {false, confEnum.INVALID, "/ledgers", "", false},
+                /*
+                * {invalid_c, "/ledgers"}, {valid_c, "/roothpath"}, {null, "/ledgers"}, {valid_c, null}
+                *
+                * {invalid_Id, true}, {valid_id, false}, {null, false}
+                * */
 
-                {false, confEnum.VALID, ".../", valid_iId, true},
-                {false, confEnum.VALID, ".../", inv_iId, false},
-                {false, confEnum.VALID, ".../", null, false},
-                {false, confEnum.VALID, ".../", "", false},
+                {false, confEnum.INVALID, "/ledgers", instanceIdEnum.VALID, false},
+                {false, confEnum.INVALID, "/ledgers", instanceIdEnum.INVALID, true},
+                {false, confEnum.INVALID, "/ledgers", instanceIdEnum.NULL, false},
 
-                {false, confEnum.NULL, "/ledgers", valid_iId, true},
-                {false, confEnum.NULL, "/ledgers", inv_iId, false},
-                {false, confEnum.NULL, "/ledgers", null, false},
-                {false, confEnum.NULL, "/ledgers", "", false},
+                {false, confEnum.VALID, "/rootpath", instanceIdEnum.VALID, false},
+                {false, confEnum.VALID, "/rootpath", instanceIdEnum.INVALID, true},
+                {false, confEnum.VALID, "/rootpath", instanceIdEnum.NULL, false},
 
-                {false, confEnum.VALID, "", valid_iId, true},
-                {false, confEnum.VALID, "", inv_iId, false},
-                {false, confEnum.VALID, "", null, false},
-                {false, confEnum.VALID, "", "", false},
+                {false, confEnum.VALID, null, instanceIdEnum.VALID, false},
+                {false, confEnum.VALID, null, instanceIdEnum.INVALID, true},
+                {false, confEnum.VALID, null, instanceIdEnum.NULL, false},
+
+                {false, confEnum.NULL, "/ledgers", instanceIdEnum.VALID, false},
+                {false, confEnum.NULL, "/ledgers", instanceIdEnum.INVALID, true},
+                {false, confEnum.NULL, "/ledgers", instanceIdEnum.NULL, false},
+
+                {true, confEnum.VALID, "/ledgers", instanceIdEnum.VALID, false},
+                {true, confEnum.VALID, "/ledgers", instanceIdEnum.INVALID, true},
+                {false, confEnum.VALID, "/ledgers", instanceIdEnum.NULL, false},
 
         });
     }
 
 
-    public NukeExistingClusterTest(boolean expected, confEnum conf, String ledgerRootPath, String instanceId, boolean force) {
+    public NukeExistingClusterTest(boolean expected, confEnum conf, String ledgerRootPath, instanceIdEnum instanceId, boolean force) {
         super(numOfBookies);
         baseConf.setLostBookieRecoveryDelay(lostBookieRecoveryDelayInitValue);
         baseConf.setOpenLedgerRereplicationGracePeriod(String.valueOf(30000));
@@ -104,6 +120,7 @@ public class NukeExistingClusterTest extends BookKeeperClusterTestCase {
                 for (int n = 0; n < numOfLedgers; n++) {
                     try (LedgerHandle lh = bkc.createLedger(numOfBookies, numOfBookies, digestType, "L".getBytes())) {
                         ledgerIds.add(lh.getId());
+                        System.out.println("ledgers Id: " + lh.getId());
                         lh.addEntry("000".getBytes());
                     }
                 }
@@ -124,44 +141,54 @@ public class NukeExistingClusterTest extends BookKeeperClusterTestCase {
         super.tearDown();
     }
 
-/*
-    @Ignore
-*/
     @Test
-    public void testNukeExistingCluster() {
+    public void testNukeExistingCluster() throws InterruptedException, KeeperException {
         boolean ret;
 
         // I need to create a new ServerConfiguration (based on baseConf) because baseConf is final
-        ServerConfiguration newConfig = new ServerConfiguration(baseConf);
+        ServerConfiguration validConf = new ServerConfiguration(baseConf);
+
+        validConf.setMetadataServiceUri(newMetadataServiceUri("/ledgers"));
+        //create a valid istanceId
+        byte[] data = zkc.getData(
+                ZKMetadataDriverBase.resolveZkLedgersRootPath(baseConf) + "/" + BookKeeperConstants.INSTANCEID,
+                false, null);
+        valid_iId = new String(data, UTF_8);
+
+        inv_iId = "7940c93b-5da8-4fa7-941e-d254d678fb1c"; // a random id that is different from the real one
+
 
 
         try {
             if (this.conf.equals(confEnum.VALID)) {
 
-                newConfig.setMetadataServiceUri(newMetadataServiceUri(this.ledgerRootPath));
-                //create a valid istanceId
-                byte[] data = zkc.getData(
-                        ZKMetadataDriverBase.resolveZkLedgersRootPath(baseConf) + "/" + BookKeeperConstants.INSTANCEID,
-                        false, null);
-                valid_iId = new String(data, UTF_8);
-
-                baseConf.setMetadataServiceUri(newMetadataServiceUri(this.ledgerRootPath));
-
-                ret = BookKeeperAdmin.nukeExistingCluster(baseConf, this.ledgerRootPath, this.instanceId, this.force);
+                if(this.instanceId.equals(instanceIdEnum.VALID))
+                    ret = BookKeeperAdmin.nukeExistingCluster(validConf, this.ledgerRootPath, valid_iId, this.force);
+                else if(this.instanceId.equals(instanceIdEnum.INVALID))
+                    ret = BookKeeperAdmin.nukeExistingCluster(validConf, this.ledgerRootPath, inv_iId, this.force);
+                else
+                    ret = BookKeeperAdmin.nukeExistingCluster(validConf, this.ledgerRootPath, null, this.force);
 
             } else if (this.conf.equals(confEnum.INVALID)) {
 
-                newConfig.setMetadataServiceUri(newMetadataServiceUri("\\wrong_path"));
-                newConfig.setBookiePort(-100);
-                newConfig.setMetadataServiceUri("wrong...");
+                validConf.setBookiePort(-100); // make the configuration invalid
+                validConf.setMetadataServiceUri(newMetadataServiceUri(null));
 
-
-                ret = BookKeeperAdmin.nukeExistingCluster(newConfig, this.ledgerRootPath, this.instanceId, this.force);
+                if(this.instanceId.equals(instanceIdEnum.VALID))
+                    ret = BookKeeperAdmin.nukeExistingCluster(validConf, this.ledgerRootPath, valid_iId, this.force);
+                else if(this.instanceId.equals(instanceIdEnum.INVALID))
+                    ret = BookKeeperAdmin.nukeExistingCluster(validConf, this.ledgerRootPath, inv_iId, this.force);
+                else
+                    ret = BookKeeperAdmin.nukeExistingCluster(validConf, this.ledgerRootPath, null, this.force);
 
             } else {
 
-                newConfig = null;
-                ret = BookKeeperAdmin.nukeExistingCluster(newConfig, this.ledgerRootPath, this.instanceId, this.force);
+                if(this.instanceId.equals(instanceIdEnum.VALID))
+                    ret = BookKeeperAdmin.nukeExistingCluster(null, this.ledgerRootPath, valid_iId, this.force);
+                else if(this.instanceId.equals(instanceIdEnum.INVALID))
+                    ret = BookKeeperAdmin.nukeExistingCluster(null, this.ledgerRootPath, inv_iId, this.force);
+                else
+                    ret = BookKeeperAdmin.nukeExistingCluster(null, this.ledgerRootPath, null, this.force);
 
             }
 
@@ -169,6 +196,7 @@ public class NukeExistingClusterTest extends BookKeeperClusterTestCase {
             ret = false;
         }
 
+        System.out.println("Test case: " + this.conf.toString() + " " + this.ledgerRootPath + " " + this.instanceId.toString() + " " + this.force);
         assertEquals(expected, ret);
     }
 }

@@ -2,6 +2,8 @@ package org.apache.bookkeeper.client;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+
+import java.io.IOException;
 import java.util.*;
 import org.apache.bookkeeper.conf.ClientConfiguration;
 import org.apache.bookkeeper.conf.ServerConfiguration;
@@ -10,7 +12,6 @@ import org.apache.bookkeeper.test.BookKeeperClusterTestCase;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-
 
 
 @RunWith(value= Parameterized.class)
@@ -35,16 +36,12 @@ public class FormatTest extends BookKeeperClusterTestCase{
         return invalid_c;
     }
 
-    @AfterClass
-    public static void cleanup() throws Exception {
-        // Ferma il server ZooKeeper locale e rilascia le risorse
-    }
 
 
     @Parameterized.Parameters
     public static Collection<Object[]> getParameters() {
         return Arrays.asList(new Object[][]{
-                // for the test with isInteractive = true an use input is expected but is not possible to mock it.
+                // for the test with isInteractive = true an user input is expected but is not possible to mock it.
                 // Assuming this, all the tests are made using isInteractive = false and the variation is only made ok force
 
                 // true for the ServerConfiguration means that it is valid
@@ -57,6 +54,7 @@ public class FormatTest extends BookKeeperClusterTestCase{
                 {false, false, false, false},
 
                 // so for all the test is meaningfull to check if metadata have been deleted after the call
+
         });
     }
 
@@ -115,13 +113,12 @@ public class FormatTest extends BookKeeperClusterTestCase{
     }
 
 
-/*
-    @Ignore
-*/
     @Test
-    public void testFormat() {
+    public void testFormat() throws IOException {
         boolean ret;
         int numOfLedgers = 2;
+
+
 
         try {
             if(this.conf) {
@@ -147,7 +144,6 @@ public class FormatTest extends BookKeeperClusterTestCase{
             }
         }
     }
-
 
 
 }

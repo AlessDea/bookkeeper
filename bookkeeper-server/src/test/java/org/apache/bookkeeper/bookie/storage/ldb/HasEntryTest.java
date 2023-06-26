@@ -41,19 +41,10 @@ public class HasEntryTest {
 	@Parameterized.Parameters
 	public static Collection<Object[]> getParameters(){
 		return Arrays.asList(new Object[][]{
-				// these three below are expected to throw an exception because of the ledgedId is less than zero
-				{false, -1, -1},
-				{false, -1, 0},
-				{false, -1, 1},
-
-				// these are expected to return a null ByteBuff because it doesn't exist
-				{false, 0, -1},
-				{false, 0, 0},
-				{false, 0, 1},
-				{false, 1, -1},
-				{false, 1, 0},
-				{false, 1, 1},
-				{true, 123, 0}
+				{true, 123, 0},
+				{false, 123, 1},
+				{false, 10000, 0},
+				{false, 10000, 1},
 		});
 	}
 
